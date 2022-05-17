@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽选中复选框</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        ul {
+            position: relative;
+            width: 200px;
+            height: auto;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        li {
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        #moveSelected {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: skyblue;
+            opacity: 0.3;
+            border: 1px dashed #d9d9d9;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="box">
+        <li><input type="checkbox" id="check1"></li>
+        <li><input type="checkbox" id="check2"></li>
+        <li><input type="checkbox" id="check3"></li>
+        <li><input type="checkbox" id="check4"></li>
+        <li><input type="checkbox" id="check5"></li>
+        <li><input type="checkbox" id="check6"></li>
+        <li><input type="checkbox" id="check7"></li>
+        <li><input type="checkbox" id="check8"></li>
+        <li><input type="checkbox" id="check9"></li>
+        <li><input type="checkbox" id="check10"></li>
+        <li><input type="checkbox" id="check11"></li>
+        <li><input type="checkbox" id="check12"></li>
+        <li><input type="checkbox" id="check13"></li>
+        <li><input type="checkbox" id="check14"></li>
+        <li><input type="checkbox" id="check15"></li>
+        <li><input type="checkbox" id="check16"></li>
+        <li><input type="checkbox" id="check17"></li>
+        <li><input type="checkbox" id="check18"></li>
+        <li><input type="checkbox" id="check19"></li>
+        <li><input type="checkbox" id="check20"></li>
+        <li><input type="checkbox" id="check21"></li>
+        <!-- 选区 -->
+        <div id="moveSelected"></div>
+    </ul>
+</body>
+
+</html>
+<script>
+    window.onload = function() {
+        let moveSelected = document.getElementById("moveSelected");
+        let flag = false;
+        let oldLeft = 0; //鼠标按下时的位置
+        let oldTop = 0;
+        let selectedList = []; //选区覆盖的checkbox集合
+        let box = document.getElementById('box') //选区
+        let checkboxs = box.getElementsByTagName("input"); //复选框
+        // 鼠标按下时开启拖拽多选，给选区设置定位
+        box.onmousedown = function(e) {
+                flag = true;
+                // console.log(e);
+                moveSelected.style.top = e.pageY + 'px';
+                moveSelected.style.left = e.pageX + 'px';
+                // console.log(moveSelected.style.left + 'pp');
+                oldLeft = e.pageX;
+                oldTop = e.pageY;
+                e.preventDefault(); // 阻止默认行为
+                e.stopPropagation(); // 阻止事件冒泡
+            }
+            // 鼠标移动时计算选区的位置和大小
+        box.onmousemove = function(e) {
+                if (!flag) return;
+                if (e.pageX < oldLeft) { //表示左移
+                    moveSelected.style.left = e.pageX + 'px';
+                    moveSelected.style.width = (oldLeft - e.pageX) + 'px'; //向左移动的距离作为选区的宽
+                } else {
+                    moveSelected.style.width = (event.pageX - oldLeft) + 'px';
+                }
+                if (e.pageY < oldTop) { //向上移动
+                    moveSelected.style.top = e.pageY + 'px';
+                    moveSelected.style.height = (oldTop - e.pageY) + 'px';
+                } else {
+                    moveSelected.style.height = (e.pageY - oldTop) + 'px';
+                }
+                e.preventDefault(); // 阻止默认行为
+                e.stopPropagation(); // 阻止事件冒泡
+            }
+            //鼠标抬起时计算选区的right和bottom，找出选中的区域，清空选区数据
+        box.onmouseup = function(e) {
+            moveSelected.style.bottom = Number(moveSelected.style.top.split('px')[0]) + Number(moveSelected.style.height.split('px')[0]) + 'px';
+            moveSelected.style.right = Number(moveSelected.style.left.split('px')[0]) + Number(moveSelected.style.width.split('px')[0]) + 'px';
+            //找出选中的区域并激活
+            for (let i = 0; i < checkboxs.length; i++) {
+                //计算每个块的定位信息
+                let left = checkboxs[i].offsetLeft + box.offsetLeft;
+                let right = checkboxs[i].offsetWidth + left;
+                let top = checkboxs[i].offsetTop + box.offsetTop;
+                let bottom = checkboxs[i].offsetHeight + top;
+                //判断是否在选择区
+                let leftCover = moveSelected.style.left.split('px')[0] <= left && left <= moveSelected.style.right.split('px')[0];
+                let rightCover = moveSelected.style.left.split('px')[0] <= right && right <= moveSelected.style.right.split('px')[0];
+                let topCover = moveSelected.style.top.split('px')[0] <= top && top <= moveSelected.style.bottom.split('px')[0];
+                let bottomCover = moveSelected.style.top.split('px')[0] <= bottom && bottom <= moveSelected.style.bottom.split('px')[0];
+                if ((leftCover || rightCover) && (topCover || bottomCover)) {
+                    selectedList.push(checkboxs[i]);
+                    checkboxs[i].checked = true;
+                }
+            }
+            //清空数据
+            flag = false;
+            moveSelected.style.width = 0;
+            moveSelected.style.height = 0;
+            moveSelected.style.top = 0;
+            moveSelected.style.left = 0;
+            moveSelected.style.bottom = 0;
+            moveSelected.style.right = 0;
+            e.preventDefault(); // 阻止默认行为
+            e.stopPropagation(); // 阻止事件冒泡
+
+        }
+        box.onmouseleave = function(e) {
+            flag = false;
+            moveSelected.style.width = 0;
+            moveSelected.style.height = 0;
+            moveSelected.style.top = 0;
+            moveSelected.style.left = 0;
+            checkboxs[i].checked = false;
+            e.preventDefault(); // 阻止默认行为
+            e.stopPropagation(); // 阻止事件冒泡
+        }
+    }
+</script>
