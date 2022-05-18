@@ -8,16 +8,15 @@
     <title>拖拽选中复选框</title>
     <style>
         * {
-            box-sizing: border-box;
             user-select: none;
         }
         
         ul {
             position: relative;
-            width: 375px;
+            width: 300px;
             height: auto;
             margin: 0 auto;
-            padding: 40px;
+            padding: 100px;
         }
         
         li {
@@ -34,10 +33,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: skyblue;
+            border: 1px dashed #2783F5;
             pointer-events: none;
-            opacity: 0.3;
-            border: 1px dashed #D5D5D5;
         }
     </style>
 </head>
@@ -111,7 +108,7 @@
                 moveSelected.style.right = Number(moveSelected.style.left.split('px')[0]) + Number(moveSelected.style.width.split('px')[0]) + 'px';
                 //找出选中的区域并激活
                 for (let i = 0; i < checkboxs.length; i++) {
-                    //计算每个checkbox的定位信息
+                    //计算每个checkbox的位置信息
                     let left = checkboxs[i].offsetLeft + box.offsetLeft;
                     let right = checkboxs[i].offsetWidth + left;
                     let top = checkboxs[i].offsetTop + box.offsetTop;
