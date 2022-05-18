@@ -14,7 +14,7 @@
         
         ul {
             position: relative;
-            width: 200px;
+            width: 375px;
             height: auto;
             margin: 0 auto;
             padding: 40px;
@@ -25,13 +25,19 @@
             margin: 5px;
         }
         
+        input {
+            width: 30px;
+            height: 30px;
+        }
+        
         #moveSelected {
             position: fixed;
             top: 0;
             left: 0;
             background-color: skyblue;
+            pointer-events: none;
             opacity: 0.3;
-            border: 1px dashed #d9d9d9;
+            border: 1px dashed #D5D5D5;
         }
     </style>
 </head>
@@ -58,9 +64,10 @@
         <li><input type="checkbox" id="check18"></li>
         <li><input type="checkbox" id="check19"></li>
         <li><input type="checkbox" id="check20"></li>
-        <li><input type="checkbox" id="check21"></li>
         <!-- 选区 -->
-        <div id="moveSelected"></div>
+        <li>
+            <div id="moveSelected"></div>
+        </li>
     </ul>
 </body>
 
@@ -71,20 +78,15 @@
         let flag = false;
         let oldLeft = 0; //鼠标按下时的位置
         let oldTop = 0;
-        let selectedList = []; //选区覆盖的checkbox集合
         let box = document.getElementById('box') //选区
         let checkboxs = box.getElementsByTagName("input"); //复选框
         // 鼠标按下时开启拖拽多选，给选区设置定位
         box.onmousedown = function(e) {
                 flag = true;
-                // console.log(e);
                 moveSelected.style.top = e.pageY + 'px';
                 moveSelected.style.left = e.pageX + 'px';
-                // console.log(moveSelected.style.left + 'pp');
                 oldLeft = e.pageX;
                 oldTop = e.pageY;
-                e.preventDefault(); // 阻止默认行为
-                e.stopPropagation(); // 阻止事件冒泡
             }
             // 鼠标移动时计算选区的位置和大小
         box.onmousemove = function(e) {
@@ -101,51 +103,44 @@
                 } else {
                     moveSelected.style.height = (e.pageY - oldTop) + 'px';
                 }
-                e.preventDefault(); // 阻止默认行为
-                e.stopPropagation(); // 阻止事件冒泡
             }
             //鼠标抬起时计算选区的right和bottom，找出选中的区域，清空选区数据
         box.onmouseup = function(e) {
-            moveSelected.style.bottom = Number(moveSelected.style.top.split('px')[0]) + Number(moveSelected.style.height.split('px')[0]) + 'px';
-            moveSelected.style.right = Number(moveSelected.style.left.split('px')[0]) + Number(moveSelected.style.width.split('px')[0]) + 'px';
-            //找出选中的区域并激活
-            for (let i = 0; i < checkboxs.length; i++) {
-                //计算每个块的定位信息
-                let left = checkboxs[i].offsetLeft + box.offsetLeft;
-                let right = checkboxs[i].offsetWidth + left;
-                let top = checkboxs[i].offsetTop + box.offsetTop;
-                let bottom = checkboxs[i].offsetHeight + top;
-                //判断是否在选择区
-                let leftCover = moveSelected.style.left.split('px')[0] <= left && left <= moveSelected.style.right.split('px')[0];
-                let rightCover = moveSelected.style.left.split('px')[0] <= right && right <= moveSelected.style.right.split('px')[0];
-                let topCover = moveSelected.style.top.split('px')[0] <= top && top <= moveSelected.style.bottom.split('px')[0];
-                let bottomCover = moveSelected.style.top.split('px')[0] <= bottom && bottom <= moveSelected.style.bottom.split('px')[0];
-                if ((leftCover || rightCover) && (topCover || bottomCover)) {
-                    selectedList.push(checkboxs[i]);
-                    checkboxs[i].checked = true;
+                if (!flag) return;
+                moveSelected.style.bottom = Number(moveSelected.style.top.split('px')[0]) + Number(moveSelected.style.height.split('px')[0]) + 'px';
+                moveSelected.style.right = Number(moveSelected.style.left.split('px')[0]) + Number(moveSelected.style.width.split('px')[0]) + 'px';
+                //找出选中的区域并激活
+                for (let i = 0; i < checkboxs.length; i++) {
+                    //计算每个checkbox的定位信息
+                    let left = checkboxs[i].offsetLeft + box.offsetLeft;
+                    let right = checkboxs[i].offsetWidth + left;
+                    let top = checkboxs[i].offsetTop + box.offsetTop;
+                    let bottom = checkboxs[i].offsetHeight + top;
+                    //判断是否在选择区
+                    let leftCover = moveSelected.style.left.split('px')[0] <= left && left <= moveSelected.style.right.split('px')[0];
+                    let rightCover = moveSelected.style.left.split('px')[0] <= right && right <= moveSelected.style.right.split('px')[0];
+                    let topCover = moveSelected.style.top.split('px')[0] <= top && top <= moveSelected.style.bottom.split('px')[0];
+                    let bottomCover = moveSelected.style.top.split('px')[0] <= bottom && bottom <= moveSelected.style.bottom.split('px')[0];
+                    if ((leftCover || rightCover) && (topCover || bottomCover)) {
+                        checkboxs[i].checked = true;
+                    }
                 }
+                //重置选区
+                flag = false;
+                moveSelected.style.width = 0;
+                moveSelected.style.height = 0;
+                moveSelected.style.top = 0;
+                moveSelected.style.left = 0;
+                moveSelected.style.bottom = 0;
+                moveSelected.style.right = 0;
             }
-            //清空数据
-            flag = false;
-            moveSelected.style.width = 0;
-            moveSelected.style.height = 0;
-            moveSelected.style.top = 0;
-            moveSelected.style.left = 0;
-            moveSelected.style.bottom = 0;
-            moveSelected.style.right = 0;
-            e.preventDefault(); // 阻止默认行为
-            e.stopPropagation(); // 阻止事件冒泡
-
-        }
+            // 鼠标超出ul选区失效
         box.onmouseleave = function(e) {
             flag = false;
             moveSelected.style.width = 0;
             moveSelected.style.height = 0;
             moveSelected.style.top = 0;
             moveSelected.style.left = 0;
-            checkboxs[i].checked = false;
-            e.preventDefault(); // 阻止默认行为
-            e.stopPropagation(); // 阻止事件冒泡
         }
     }
 </script>
