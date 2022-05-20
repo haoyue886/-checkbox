@@ -92,7 +92,7 @@
                     moveSelected.style.left = e.pageX + 'px';
                     moveSelected.style.width = (oldLeft - e.pageX) + 'px'; //向左移动的距离作为选区的宽
                 } else {
-                    moveSelected.style.width = (event.pageX - oldLeft) + 'px';
+                    moveSelected.style.width = (e.pageX - oldLeft) + 'px';
                 }
                 if (e.pageY < oldTop) { //向上移动
                     moveSelected.style.top = e.pageY + 'px';
