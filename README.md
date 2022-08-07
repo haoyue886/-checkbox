@@ -1,3 +1,2 @@
 # 拖拽框
-
-线上地址：https://haoyue886.github.io/-checkbox/
+演示效果：https://haoyue886.github.io/-checkbox/
